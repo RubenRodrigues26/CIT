@@ -1,0 +1,1001 @@
+mysql> create database if not exists hotelbooking;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> use hotelbooking;
+Database changed
+
+mysql> create table if not exists hotel(hotelno varchar(10) not null, hotelname varchar(30), city varchar(10))engine=innodb;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> create table if not exists room(roomno varchar(10) not null, hotelno varchar(10) not null, type varchar(10), price double(8,2))engine=innodb;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> create table if not exists booking(hotelno varchar(10) not null, guestno varchar(10) not null, datefrom date not null, dateto date, roomno varchar(5) not null)engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists guest(guestno varchar(10) not null default '', guestname varchar(20) default '', guestaddress varchar(30) default '')engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> alter table hotel add constraint pk_hotel primary key(hotelno);
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table room add constraint pk_room primary key(roomno, hotelno);
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table guest add constraint pk_guest primary key(guestno);
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table booking add constraint pk_booking primary key(guestno, hotelno, datefrom);
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table room add constraint fk_room foreign key (hotelno) references hotel(hotelno) on update restrict on delete cascade;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table booking add constraint fk_booking foreign key (roomno, hotelno) references room(roomno, hotelno) on update restrict on delete restrict;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table booking add constraint fk_booking0 foreign key (guestno) references guest(guestno) on update restrict on delete restrict;
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+
+mysql> desc hotel;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| hotelno   | varchar(10) | NO   | PRI | NULL    |       |
+| hotelname | varchar(30) | YES  |     | NULL    |       |
+| city      | varchar(10) | YES  |     | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+3 rows in set (0.01 sec)
+
+mysql> desc room;
++---------+-------------+------+-----+---------+-------+
+| Field   | Type        | Null | Key | Default | Extra |
++---------+-------------+------+-----+---------+-------+
+| roomno  | varchar(10) | NO   | PRI | NULL    |       |
+| hotelno | varchar(10) | NO   | PRI | NULL    |       |
+| type    | varchar(10) | YES  |     | NULL    |       |
+| price   | double(8,2) | YES  |     | NULL    |       |
++---------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> desc booking;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| hotelno  | varchar(10) | NO   | PRI | NULL    |       |
+| guestno  | varchar(10) | NO   | PRI | NULL    |       |
+| datefrom | date        | NO   | PRI | NULL    |       |
+| dateto   | date        | YES  |     | NULL    |       |
+| roomno   | varchar(5)  | NO   | MUL | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+5 rows in set (0.00 sec)
+
+mysql> desc guest;
++--------------+-------------+------+-----+---------+-------+
+| Field        | Type        | Null | Key | Default | Extra |
++--------------+-------------+------+-----+---------+-------+
+| guestno      | varchar(10) | NO   | PRI |         |       |
+| guestname    | varchar(20) | YES  |     |         |       |
+| guestaddress | varchar(30) | YES  |     |         |       |
++--------------+-------------+------+-----+---------+-------+
+3 rows in set (0.01 sec)
+
+mysql> set foreign_key_checks = 0;
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> load data local infile '/home/r00144165/DB/hotel.txt' into table hotel fields terminated by ',' lines terminated by '|' ignore 1 lines;
+Query OK, 4 rows affected (0.01 sec)
+Records: 4  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/room.txt' into table room fields terminated by ',' lines terminated by '|' ignore 1 lines;
+Query OK, 9 rows affected, 1 warning (0.00 sec)
+Records: 9  Deleted: 0  Skipped: 0  Warnings: 1
+
+mysql> load data local infile '/home/r00144165/DB/booking.txt' into table booking fields terminated by ',' lines terminated by '|' ignore 1 lines;
+Query OK, 6 rows affected, 1 warning (0.01 sec)
+Records: 6  Deleted: 0  Skipped: 0  Warnings: 1
+
+mysql> load data local infile '/home/r00144165/DB/guest.txt' into table guest fields terminated by ',' lines terminated by '|' ignore 1 lines;
+Query OK, 5 rows affected (0.03 sec)
+Records: 5  Deleted: 0  Skipped: 0  Warnings: 0
+
+
+mysql> select * from hotel;
++---------+---------------+------------+
+| hotelno | hotelname     | city       |
++---------+---------------+------------+
+| H001    | Meteor Garden | Washington |
+| H002    | Hilton        | Texas      |
+| H003    | Grosvenor     | Boston     |
+| H004    | Imperical     | New York
+ |
++---------+---------------+------------+
+4 rows in set (0.00 sec)
+
+mysql> select * from room;
++--------+---------+--------+--------+
+| roomno | hotelno | type   | price  |
++--------+---------+--------+--------+
+| R001   | H001    | single |  30.00 |
+| R101   | H001    | double |  25.00 |
+| R101   | H002    | single |  57.00 |
+| R104   | H002    | double |  90.00 |
+| R110   | H003    | double |  35.00 |
+| R210   | H003    | family | 200.00 |
+| R302   | H001    | family |  40.00 |
+| R302   | H002    | family | 150.00 |
+| R907   | H004    | family | 200.00 |
++--------+---------+--------+--------+
+9 rows in set (0.00 sec)
+
+mysql> select * from booking;
++---------+---------+------------+------------+--------+
+| hotelno | guestno | datefrom   | dateto     | roomno |
++---------+---------+------------+------------+--------+
+| H002   | ' '     | 2013-01-19 | 2013-01-20 | R302
+|  H002  | ' '     | 2013-01-11 | 2013-01-14 | ' '    |
+| H001   | G001    | 2012-08-02 | 2013-01-14 | R001   |
+|  H003  | G001    | 2013-07-15 | 2013-01-14 | R210   |
+| H002   | G002    | 2013-01-01 | 2013-01-03 | R104   |
+|  
+H004  | G003    | 2012-12-31 | 2013-01-14 | R907   |
++---------+---------+------------+------------+--------+
+6 rows in set (0.00 sec)
+
+mysql> select * from guest;
++---------+-----------+------------------+
+| guestno | guestname | guestaddress     |
++---------+-----------+------------------+
+| 
+G001   | Mary      | Cork Ireland     |
+| 
+G002   | Tom       | NY USA           |
+| 
+G003   | John      | Dublin Ireland   |
+| 
+G005   | Ruben     | Lisbon Portugal
+|  
+G004  | Sephenie  | Paris France     |
++---------+-----------+------------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from Hotel, Guest, Booking, Room;
++---------+---------------+------------+---------+-----------+-----------------+---------+---------+------------+------------+--------+--------+---------+-----------+--------+
+| hotelNo | hotelName     | city       | guestNo | guestName | guestAddress    | hotelNo | guestNo | dateFrom   | dateTo     | roomNo | roomNo | hotelNo | hoteltype | price  |
++---------+---------------+------------+---------+-----------+-----------------+---------+---------+------------+------------+--------+--------+---------+-----------+--------+
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R001   | H001    | single    |  30.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H001    | double    |  25.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R101   | H002    | single    |  57.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R104   | H002    | double    |  90.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R110   | H003    | double    |  35.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R210   | H003    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H001    | family    |  40.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R302   | H002    | family    | 150.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G001    | Mary      | Cork, Ireland   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G002    | Tom       | NY, USA         | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G003    | John      | Dublin, Ireland | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G004    | Stephenie | Paris, France   | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H001    | G001    | 2012-08-02 | NULL       | R001   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H003    | G001    | 2013-07-15 | NULL       | R210   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H002    | G002    | 2013-01-01 | 2013-01-03 | R104   | R907   | H004    | family    | 200.00 |
+| H001    | Meteor Garden | Washington | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H002    | Hilton        | Texas      | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H003    | Grosvenor     | Boston     | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
+| H004    | Imperical     | New York   | G005    |           |                 | H004    | G003    | 2013-12-31 | 2013-01-14 | R907   | R907   | H004    | family    | 200.00 |
++---------+---------------+------------+---------+-----------+-----------------+---------+---------+------------+------------+--------+--------+---------+-----------+--------+
+720 rows in set (0.01 sec)
+
+mysql> select * from Hotel where city='London';
+Empty set (0.11 sec)
+
+mysql> select * from Booking where dateTo is null;
++---------+---------+------------+--------+--------+
+| hotelNo | guestNo | dateFrom   | dateTo | roomNo |
++---------+---------+------------+--------+--------+
+| H001    | G001    | 2012-08-02 | NULL   | R001   |
+| H003    | G001    | 2013-07-15 | NULL   | R210   |
++---------+---------+------------+--------+--------+
+2 rows in set (0.00 sec)
+
+mysql> select guestname, guestaddress from Guest where guestaddress like 'London%' order by guestname desc;
+Empty set (0.00 sec)
+
+mysql> select hoteltype, price from Room where price < 40 order by price;
++-----------+-------+
+| hoteltype | price |
++-----------+-------+
+| double    | 25.00 |
+| single    | 30.00 |
+| double    | 35.00 |
++-----------+-------+
+3 rows in set (0.00 sec)
+
+mysql> select count(distinct hotelNo) as sumHotel from Hotel;
++----------+
+| sumHotel |
++----------+
+|        4 |
++----------+
+1 row in set (0.00 sec)
+
+mysql> select avg(price) as avgPrice from Room;
++-----------+
+| avgPrice  |
++-----------+
+| 91.888889 |
++-----------+
+1 row in set (0.00 sec)
+
+mysql> select sum(price) as doublePrice from Room where hoteltype='double';
++-------------+
+| doublePrice |
++-------------+
+|      150.00 |
++-------------+
+1 row in set (0.00 sec)
+
+mysql> select count(distinct guestNo) as guestCount from Booking where dateFrom between '2012-08-01' and '2012-08-31';
++------------+
+| guestCount |
++------------+
+|          1 |
++------------+
+1 row in set (0.00 sec)
+
+mysql> select roomNo,hoteltype,price from Room where exists(select * from Hotel where Room.hotelNo = Hotel.hotelNo and hotelName like '%Grosvenor%');
++--------+-----------+--------+
+| roomNo | hoteltype | price  |
++--------+-----------+--------+
+| R110   | double    |  35.00 |
+| R210   | family    | 200.00 |
++--------+-----------+--------+
+2 rows in set (0.00 sec)
+
+mysql> select * from Guest,Hotel where exists(select * from Booking where Guest.guestNo=Booking.guestNo and Booking.hotelNo=Hotel.hotelNo and hotelName like '%Grosvenor%');
++---------+-----------+---------------+---------+-----------+--------+
+| guestNo | guestName | guestAddress  | hotelNo | hotelName | city   |
++---------+-----------+---------------+---------+-----------+--------+
+| G001    | Mary      | Cork, Ireland | H003    | Grosvenor | Boston |
++---------+-----------+---------------+---------+-----------+--------+
+1 row in set (0.03 sec)
+
+mysql> select Hotel.hotelName, count(*) as numRooms from Hotel, Room where Hotel.hotelno=Room.hotelNo and city='London' group by hotelName;
+Empty set (0.06 sec)
+
+mysql> select Hotel.hotelname, count(*) as numRooms from Hotel, Room where Hotel.hotelno=Room.hotelNo group by hotelName;
++---------------+----------+
+| hotelname     | numRooms |
++---------------+----------+
+| Grosvenor     |        2 |
+| Hilton        |        3 |
+| Imperical     |        1 |
+| Meteor Garden |        3 |
++---------------+----------+
+4 rows in set (0.04 sec)
+
+mysql> select Guest.guestNo, Guest.guestName, Guest.guestAddress, Booking.roomNo, Hotel.hotelName from Hotel,Booking,Guest where Booking.guestNo = Guest.guestNo and Booking.hotelNo = Hotel.hotelNo and hotelName = 'Grosvenor';
++---------+-----------+---------------+--------+-----------+
+| guestNo | guestName | guestAddress  | roomNo | hotelName |
++---------+-----------+---------------+--------+-----------+
+| G001    | Mary      | Cork, Ireland | R210   | Grosvenor |
++---------+-----------+---------------+--------+-----------+
+1 row in set (0.03 sec)
+
+mysql> select Hotel.hotelName,Room.hotelNo,Room.roomNo from Booking,Room,Hotel where Booking.roomNo != Room.roomNo and Booking.hotelNo = Room.hotelNo and Booking.hotelNo = Hotel.hotelNo and hotelName = 'Grosvenor';
++-----------+---------+--------+
+| hotelName | hotelNo | roomNo |
++-----------+---------+--------+
+| Grosvenor | H003    | R110   |
++-----------+---------+--------+
+1 row in set (0.00 sec)
+
+

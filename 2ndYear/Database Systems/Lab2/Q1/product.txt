@@ -1,0 +1,5 @@
+productCd|name
+CHK|Checking
+SAV|Savings
+MM|Money market
+LOC|Line of Credit

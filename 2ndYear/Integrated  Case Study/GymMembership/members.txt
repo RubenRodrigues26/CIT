@@ -1,0 +1,6 @@
+1|Ruben|Island|Standard|123.0|2017/05/31|
+2|Goblin|Montains|Standard|22.0|2017/05/31|
+3|Fish|Island|Standard|50.0|2017/05/31|
+6|John|123 Terrace|Standard|25.0|2017/05/31|
+7|David|Opera Lane|Standard|25.0|2017/05/31|
+8|Pawel|Baron Street|Standard|50.0|2017/05/31|

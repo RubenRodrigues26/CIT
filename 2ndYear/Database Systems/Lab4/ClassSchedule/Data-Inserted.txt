@@ -1,0 +1,275 @@
+mysql> create database if not exists classschedule;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> use classschedule;
+Database changed
+
+mysql> create table if not exists student(student_id int(5) unsigned not null, student_name varchar(25), primary key(student_id))engine=innodb;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> create table if not exists qualified(faculity_id int(5) unsigned not null, course_id varchar(8) not null, date_qualified date, primary key(faculity_id, course_id))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists faculity(faculity_id int(5) unsigned not null, faculty_name varchar(25), primary key(faculity_id))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists section(section_no int(5) unsigned not null auto_increment, semester varchar(8) not null, course_id varchar(8) not null, primary key(section_no, semester, course_id))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists course(course_id char(5) not null, course_name varchar(15), primary key(course_id))engine=innodb;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> create table if not exists registration(student_id int(5) unsigned not null, section_no int(5) unsigned not null, semester varchar(8) not null, primary key(student_id, section_no, semester))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> alter table qualified add constraint fk_qualified foreign key (faculity_id) references faculity(faculity_id) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table qualified add constraint fk_qualified0 foreign key (course_id) references course(course_id) on delete cascade on update cascade;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table section add constraint fk_section foreign key (course_id) references course(course_id) on delete cascade on update cascade;
+Query OK, 0 rows affected (0.09 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table registration add constraint fk_registration foreign key (student_id) references student(student_id) on delete cascade on update cascade;
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table registration add constraint fk_registration0 foreign key (section_no, semester) references section(section_no, semester) on delete no action on update no action;
+
+Query OK, 0 rows affected (0.06 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+
+mysql> desc student;
++--------------+-----------------+------+-----+---------+-------+
+| Field        | Type            | Null | Key | Default | Extra |
++--------------+-----------------+------+-----+---------+-------+
+| student_id   | int(5) unsigned | NO   | PRI | NULL    |       |
+| student_name | varchar(25)     | YES  |     | NULL    |       |
++--------------+-----------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> desc qualified;
++----------------+-----------------+------+-----+---------+-------+
+| Field          | Type            | Null | Key | Default | Extra |
++----------------+-----------------+------+-----+---------+-------+
+| faculity_id    | int(5) unsigned | NO   | PRI | NULL    |       |
+| course_id      | varchar(8)      | NO   | PRI | NULL    |       |
+| date_qualified | date            | YES  |     | NULL    |       |
++----------------+-----------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> desc faculity;
++--------------+-----------------+------+-----+---------+-------+
+| Field        | Type            | Null | Key | Default | Extra |
++--------------+-----------------+------+-----+---------+-------+
+| faculity_id  | int(5) unsigned | NO   | PRI | NULL    |       |
+| faculty_name | varchar(25)     | YES  |     | NULL    |       |
++--------------+-----------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> desc section;
++------------+-----------------+------+-----+---------+----------------+
+| Field      | Type            | Null | Key | Default | Extra          |
++------------+-----------------+------+-----+---------+----------------+
+| section_no | int(5) unsigned | NO   | PRI | NULL    | auto_increment |
+| semester   | varchar(8)      | NO   | PRI | NULL    |                |
+| course_id  | varchar(8)      | NO   | PRI | NULL    |                |
++------------+-----------------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> desc course;
++-------------+-------------+------+-----+---------+-------+
+| Field       | Type        | Null | Key | Default | Extra |
++-------------+-------------+------+-----+---------+-------+
+| course_id   | char(5)     | NO   | PRI | NULL    |       |
+| course_name | varchar(15) | YES  |     | NULL    |       |
++-------------+-------------+------+-----+---------+-------+
+2 rows in set (0.01 sec)
+
+mysql> desc registration;
++------------+-----------------+------+-----+---------+-------+
+| Field      | Type            | Null | Key | Default | Extra |
++------------+-----------------+------+-----+---------+-------+
+| student_id | int(5) unsigned | NO   | PRI | NULL    |       |
+| section_no | int(5) unsigned | NO   | PRI | NULL    |       |
+| semester   | varchar(8)      | NO   | PRI | NULL    |       |
++------------+-----------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> insert into student values (38214,'Letersky'),(54907,'Altvater'),(66324,'Aiken'),(70542,'Marra');
+Query OK, 4 rows affected (0.01 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> insert into faculity values (2143,'Birkin'),(3467,'Berndt'),(4756,'Collins');
+Query OK, 3 rows affected (0.00 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> insert into course values ('ISM 3112','Syst Design'),('ISM 3113', 'Syst Analysis'),('ISM 4212','Database'),('ISM 4930','Networking');
+Query OK, 4 rows affected (0.01 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> insert into qualified values (2143,'ISM 3112','1988-09-01'),(2143,'ISM 3113','1988-09-01'),(3467,'ISM 4212','1995-09-01'),(3467,'ISM 4930','1996-09-01'),(4756,'ISM 3113','1991-09-01'),(4756,'ISM 3112','1991-09-01');
+Query OK, 6 rows affected (0.00 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> alter table section auto_increment=2712;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> insert into section(semester,course_id) values ('I-2008','ISM 3113'),('I-2009','ISM 3113'),('I-2008','ISM 4212'),('I-2010','ISM 4930');
+Query OK, 4 rows affected (0.01 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> insert into registration values (38214,2714,'I-2008'),(54907,2714,'I-2009'),(54907,2715,'I-2010'),(66324,2713,'I-2008');
+Query OK, 4 rows affected (0.00 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> select * from student;
++------------+--------------+
+| student_id | student_name |
++------------+--------------+
+|      38214 | Letersky     |
+|      54907 | Altvater     |
+|      66324 | Aiken        |
+|      70542 | Marra        |
++------------+--------------+
+4 rows in set (0.00 sec)
+
+mysql> select * from faculity;
++-------------+--------------+
+| faculity_id | faculty_name |
++-------------+--------------+
+|        2143 | Birkin       |
+|        3467 | Berndt       |
+|        4756 | Collins      |
++-------------+--------------+
+3 rows in set (0.00 sec)
+
+mysql> select * from course;
++-----------+---------------+
+| course_id | course_name   |
++-----------+---------------+
+| ISM 3112  | Syst Design   |
+| ISM 3113  | Syst Analysis |
+| ISM 4212  | Database      |
+| ISM 4930  | Networking    |
++-----------+---------------+
+4 rows in set (0.00 sec)
+
+mysql> select * from qualified;
++-------------+-----------+----------------+
+| faculity_id | course_id | date_qualified |
++-------------+-----------+----------------+
+|        2143 | ISM 3112  | 1988-09-01     |
+|        2143 | ISM 3113  | 1988-09-01     |
+|        3467 | ISM 4212  | 1995-09-01     |
+|        3467 | ISM 4930  | 1996-09-01     |
+|        4756 | ISM 3112  | 1991-09-01     |
+|        4756 | ISM 3113  | 1991-09-01     |
++-------------+-----------+----------------+
+6 rows in set (0.00 sec)
+
+mysql> select * from section;
++------------+----------+-----------+
+| section_no | semester | course_id |
++------------+----------+-----------+
+|       2712 | I-2008   | ISM 3113  |
+|       2713 | I-2009   | ISM 3113  |
+|       2714 | I-2008   | ISM 4212  |
+|       2715 | I-2010   | ISM 4930  |
++------------+----------+-----------+
+4 rows in set (0.00 sec)
+
+mysql> select * from registration;
++------------+------------+----------+
+| student_id | section_no | semester |
++------------+------------+----------+
+|      66324 |       2713 | I-2008   |
+|      38214 |       2714 | I-2008   |
+|      54907 |       2714 | I-2009   |
+|      54907 |       2715 | I-2010   |
++------------+------------+----------+
+4 rows in set (0.00 sec)
+
+mysql> select * from student where student_id < 50000;
++------------+--------------+
+| student_id | student_name |
++------------+--------------+
+|      38214 | Letersky     |
++------------+--------------+
+1 row in set (0.05 sec)
+
+mysql> select * from faculity where faculity_id = 4756;
++-------------+--------------+
+| faculity_id | faculty_name |
++-------------+--------------+
+|        4756 | Collins      |
++-------------+--------------+
+1 row in set (0.04 sec)
+
+mysql> select * from qualified where date_qualified > '1993-01-00';
++-------------+-----------+----------------+
+| faculity_id | course_id | date_qualified |
++-------------+-----------+----------------+
+|        3467 | ISM 4212  | 1995-09-01     |
+|        3467 | ISM 4930  | 1996-09-01     |
++-------------+-----------+----------------+
+2 rows in set, 1 warning (0.03 sec)
+
+mysql> select distinct course_id from section;
++-----------+
+| course_id |
++-----------+
+| ISM 3113  |
+| ISM 4212  |
+| ISM 4930  |
++-----------+
+3 rows in set (0.05 sec)
+
+mysql> select min(section_no) as SmallestSectionNo from section where semester='I-2008';
++-------------------+
+| SmallestSectionNo |
++-------------------+
+|              2712 |
++-------------------+
+1 row in set (0.10 sec)
+
+mysql> select count(student_id) as studentCount from registration where semester='I-2008' and section_no='2714';
++--------------+
+| studentCount |
++--------------+
+|            2 |
++--------------+
+1 row in set (0.00 sec)
+
+
+mysql> select student_name from student order by student_name;
++--------------+
+| student_name |
++--------------+
+| Aiken        |
+| Altvater     |
+| Letersky     |
+| Marra        |
++--------------+
+4 rows in set (0.00 sec)
+
+mysql> select student_id from registration where semester='I-2008' group by student_id,section_no;
++------------+
+| student_id |
++------------+
+|      38214 |
+|      54907 |
+|      54907 |
+|      66324 |
++------------+
+4 rows in set (0.06 sec)
+
+
+
+

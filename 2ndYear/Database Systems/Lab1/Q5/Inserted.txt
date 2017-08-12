@@ -1,0 +1,65 @@
+mysql> create database if not exists AdultLiteracy;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> use AdultLiteracy;
+Database changed
+
+mysql> create table if not exists tutor(tutor_id int unsigned not null auto_increment, cert_date date, status enum('Active', 'Temp Stop', 'Dropped'), primary key(tutor_id))engine=innodb;
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> create table if not exists student(student_id int unsigned not null auto_increment, score double(8,2), primary key(student_id))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists match_history(match_id int unsigned not null auto_increment, tutor_id int unsigned not null, student_id int unsigned not null, start_date date, end_date date, primary key(match_id))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> alter table match_history add constraint fk_match_history foreign key (tutor_id) references tutor(tutor_id) on delete no action on update restrict;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table match_history add constraint fk_match_history2 foreign key (student_id) references student(student_id) on delete no action on update restrict;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> insert into tutor(cert_date,status) values ('2020-01-01','Dropped'),('2020-02-01','Active'),('2020-03-01','Temp Stop'), ('2020-04-01','Active'),('2020-05-01','Dropped'),('2008-06-01','Temp Stop'),('2008-07-01','Dropped');
+Query OK, 7 rows affected (0.01 sec)
+Records: 7  Duplicates: 0  Warnings: 0
+
+mysql> insert into student(score) values (1.1),(1.2),(1.3),(1.4),(1.5),(1.6),(1.7),(1.9);
+Query OK, 8 rows affected (0.00 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql> desc tutor;
++-----------+--------------------------------------+------+-----+---------+----------------+
+| Field     | Type                                 | Null | Key | Default | Extra          |
++-----------+--------------------------------------+------+-----+---------+----------------+
+| tutor_id  | int(10) unsigned                     | NO   | PRI | NULL    | auto_increment |
+| cert_date | date                                 | YES  |     | NULL    |                |
+| status    | enum('Active','Temp Stop','Dropped') | YES  |     | NULL    |                |
++-----------+--------------------------------------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> desc student;
++------------+------------------+------+-----+---------+----------------+
+| Field      | Type             | Null | Key | Default | Extra          |
++------------+------------------+------+-----+---------+----------------+
+| student_id | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+| score      | double(8,2)      | YES  |     | NULL    |                |
++------------+------------------+------+-----+---------+----------------+
+2 rows in set (0.01 sec)
+
+mysql> desc match_history;
++------------+------------------+------+-----+---------+----------------+
+| Field      | Type             | Null | Key | Default | Extra          |
++------------+------------------+------+-----+---------+----------------+
+| match_id   | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+| tutor_id   | int(10) unsigned | NO   | MUL | NULL    |                |
+| student_id | int(10) unsigned | NO   | MUL | NULL    |                |
+| start_date | date             | YES  |     | NULL    |                |
+| end_date   | date             | YES  |     | NULL    |                |
++------------+------------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
+
+
+
+

@@ -1,0 +1,12 @@
+--- 2012 DATA ---
+
+
+2012 - Q1 - 9300
+2012 - Q2 - 10225
+2012 - Q3 - 12420
+2012 - Q4 - 13250
+
+--- 2012 RESULTS ---
+2012 Average Sales:11298
+Lowest sales were in Q1 (9300)
+Highest sales were in Q4 (13250)

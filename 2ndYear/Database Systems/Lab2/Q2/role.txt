@@ -1,0 +1,9 @@
+actorno|catalogno|character
+A1002|207132|James Bond
+A3006|330553|Frodo Baggins
+A3006|902355|Harry Potter
+A2019|634817|Captain Steve Hiller
+A2019|445624|Agent J
+A7525|445624|Agent K
+A4343|781132|Shrek
+

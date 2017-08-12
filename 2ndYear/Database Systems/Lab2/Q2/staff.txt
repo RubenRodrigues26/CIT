@@ -1,0 +1,7 @@
+staffno|name|position|salary|branchno
+S1500|Tom Daniels|Manager|46000|B001
+S0003|Sally Adams|Assistant|30000|B001
+S0010|Mary Martinez|Manager|50000|B002
+S3250|Robert Chin|Supervisor|32000|B002
+S2250|Sally Stern|Manager|48000|B004
+S0415|Art Peters|Manager|41000|B003

@@ -1,0 +1,20 @@
+create database if not exists classschedule;
+use classschedule;
+create table if not exists student(student_id int(5) unsigned not null, student_name varchar(25), primary key(student_id))engine=innodb;
+create table if not exists qualified(faculity_id int(5) unsigned not null, course_id varchar(8) not null, date_qualified date, primary key(faculity_id, course_id))engine=innodb;
+create table if not exists faculity(faculity_id int(5) unsigned not null, faculty_name varchar(25), primary key(faculity_id))engine=innodb;
+create table if not exists section(section_no int(5) unsigned not null auto_increment, semester varchar(8) not null, course_id varchar(8) not null, primary key(section_no, semester, course_id))engine=innodb;
+create table if not exists course(course_id char(5) not null, course_name varchar(15), primary key(course_id))engine=innodb;
+create table if not exists registration(student_id int(5) unsigned not null, section_no int(5) unsigned not null, semester varchar(8) not null, primary key(student_id, section_no, semester))engine=innodb;
+alter table qualified add constraint fk_qualified foreign key (faculity_id) references faculity(faculity_id) on delete restrict on update restrict;
+alter table qualified add constraint fk_qualified0 foreign key (course_id) references course(course_id) on delete cascade on update cascade;
+alter table section add constraint fk_section foreign key (course_id) references course(course_id) on delete cascade on update cascade;
+alter table registration add constraint fk_registration foreign key (student_id) references student(student_id) on delete cascade on update cascade;
+alter table registration add constraint fk_registration0 foreign key (section_no, semester) references section(section_no, semester) on delete no action on update no action;
+desc student;
+desc qualified;
+desc faculity;
+desc section;
+desc course;
+desc registration;
+

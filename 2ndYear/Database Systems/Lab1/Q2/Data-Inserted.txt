@@ -1,0 +1,234 @@
+mysql> create database if not exists stayhome;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> use stayhome;
+Database changed
+
+mysql> create table if not exists branch(branchno varchar(5) not null, street varchar(30), city varchar(10), state char(2), zipcode char(5), mgrstaffno varchar(5) not null)engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists staff(staffno varchar(5) not null, name varchar(20), position varchar(10), salary double(8, 2), branchno varchar(6) not null)engine=innodb;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> create table if not exists video(catalogno varchar(5) not null, title varchar(20), category varchar(10), dailyrental double(6,2), price double(6,2), directorno varchar(5) not null)engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists director(directorno varchar(5) not null, directorname varchar(20))engine=innodb;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> create table if not exists actor(actorno varchar(5) not null, actorname varchar(20))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists role(actorno varchar(5) not null, catalogno varchar(5) not null, characters varchar(20))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists members(memberno varchar(5) not null, fname varchar(15), lname varchar(15), address varchar(30))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists registration(branchno varchar(5) not null,memberno varchar(5) not null,staffno varchar(5) not null,datejoined date)engine=innodb;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> create table if not exists rentalagreement(rentalno varchar(5) not null, dateout date, datereturn date, memberno varchar(5) not null, videono varchar(5) not null)engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists videoforrent(videono varchar(5) not null, available bool, catalogno varchar(5) not null, branchno varchar(5) not null)engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> alter table branch add constraint pk_branch primary key(branchno);
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table staff add constraint pk_staff primary key(staffno);
+Query OK, 0 rows affected (0.09 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table video add constraint pk_video primary key(catalogno);
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table director add constraint pk_director primary key(directorno);
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table actor add constraint pk_actor primary key(actorno);
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table role add constraint pk_role primary key(actorno, catalogno);
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table members add constraint pk_member primary key(memberno);
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table registration add constraint pk_registration primary key(branchno, memberno);
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table rentalagreement add constraint pk_rentalagreement primary key(rentalno);
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table videoforrent add constraint pk_video primary key(videono);
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table branch add constraint fk_branch foreign key (mgrstaffno) references staff(staffno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table staff add constraint fk_staff foreign key (branchno) references branch(branchno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.06 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table video add constraint fk_video foreign key (directorno) references director(directorno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table role add constraint fk_role0 foreign key (actorno) references actor(actorno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table role add constraint fk_role1 foreign key (catalogno) references video(catalogno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table registration add constraint fk_registration foreign key (branchno) references branch(branchno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table registration add constraint fk_registration0 foreign key (memberno) references members(memberno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table registration add constraint fk_registration1 foreign key (staffno) references staff(staffno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table rentalagreement add constraint fk_rentalaggrement foreign key (memberno) references members(memberno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.09 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table rentalagreement add constraint fk_rentalaggrement0 foreign key (videono) references videoforrent(videono) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.09 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table videoforrent add constraint fk_videoforrent foreign key (catalogno) references video(catalogno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table videoforrent add constraint fk_videoforrent0 foreign key (branchno) references branch(branchno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc branch;
++------------+-------------+------+-----+---------+-------+
+| Field      | Type        | Null | Key | Default | Extra |
++------------+-------------+------+-----+---------+-------+
+| branchno   | varchar(5)  | NO   | PRI | NULL    |       |
+| street     | varchar(30) | YES  |     | NULL    |       |
+| city       | varchar(10) | YES  |     | NULL    |       |
+| state      | char(2)     | YES  |     | NULL    |       |
+| zipcode    | char(5)     | YES  |     | NULL    |       |
+| mgrstaffno | varchar(5)  | NO   | MUL | NULL    |       |
++------------+-------------+------+-----+---------+-------+
+6 rows in set (0.00 sec)
+
+mysql> desc staff;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| staffno  | varchar(5)  | NO   | PRI | NULL    |       |
+| name     | varchar(20) | YES  |     | NULL    |       |
+| position | varchar(10) | YES  |     | NULL    |       |
+| salary   | double(8,2) | YES  |     | NULL    |       |
+| branchno | varchar(6)  | NO   | MUL | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+5 rows in set (0.01 sec)
+
+mysql> desc video;
++-------------+-------------+------+-----+---------+-------+
+| Field       | Type        | Null | Key | Default | Extra |
++-------------+-------------+------+-----+---------+-------+
+| catalogno   | varchar(5)  | NO   | PRI | NULL    |       |
+| title       | varchar(20) | YES  |     | NULL    |       |
+| category    | varchar(10) | YES  |     | NULL    |       |
+| dailyrental | double(6,2) | YES  |     | NULL    |       |
+| price       | double(6,2) | YES  |     | NULL    |       |
+| directorno  | varchar(5)  | NO   | MUL | NULL    |       |
++-------------+-------------+------+-----+---------+-------+
+6 rows in set (0.00 sec)
+
+mysql> desc director;
++--------------+-------------+------+-----+---------+-------+
+| Field        | Type        | Null | Key | Default | Extra |
++--------------+-------------+------+-----+---------+-------+
+| directorno   | varchar(5)  | NO   | PRI | NULL    |       |
+| directorname | varchar(20) | YES  |     | NULL    |       |
++--------------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> desc actor;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| actorno   | varchar(5)  | NO   | PRI | NULL    |       |
+| actorname | varchar(20) | YES  |     | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> desc role;
++------------+-------------+------+-----+---------+-------+
+| Field      | Type        | Null | Key | Default | Extra |
++------------+-------------+------+-----+---------+-------+
+| actorno    | varchar(5)  | NO   | PRI | NULL    |       |
+| catalogno  | varchar(5)  | NO   | PRI | NULL    |       |
+| characters | varchar(20) | YES  |     | NULL    |       |
++------------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> desc members;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| memberno | varchar(5)  | NO   | PRI | NULL    |       |
+| fname    | varchar(15) | YES  |     | NULL    |       |
+| lname    | varchar(15) | YES  |     | NULL    |       |
+| address  | varchar(30) | YES  |     | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> desc registration;
++------------+------------+------+-----+---------+-------+
+| Field      | Type       | Null | Key | Default | Extra |
++------------+------------+------+-----+---------+-------+
+| branchno   | varchar(5) | NO   | PRI | NULL    |       |
+| memberno   | varchar(5) | NO   | PRI | NULL    |       |
+| staffno    | varchar(5) | NO   | MUL | NULL    |       |
+| datejoined | date       | YES  |     | NULL    |       |
++------------+------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> desc rentalagreement;
++------------+------------+------+-----+---------+-------+
+| Field      | Type       | Null | Key | Default | Extra |
++------------+------------+------+-----+---------+-------+
+| rentalno   | varchar(5) | NO   | PRI | NULL    |       |
+| dateout    | date       | YES  |     | NULL    |       |
+| datereturn | date       | YES  |     | NULL    |       |
+| memberno   | varchar(5) | NO   | MUL | NULL    |       |
+| videono    | varchar(5) | NO   | MUL | NULL    |       |
++------------+------------+------+-----+---------+-------+
+5 rows in set (0.00 sec)
+
+mysql> desc videoforrent;
++-----------+------------+------+-----+---------+-------+
+| Field     | Type       | Null | Key | Default | Extra |
++-----------+------------+------+-----+---------+-------+
+| videono   | varchar(5) | NO   | PRI | NULL    |       |
+| available | tinyint(1) | YES  |     | NULL    |       |
+| catalogno | varchar(5) | NO   | MUL | NULL    |       |
+| branchno  | varchar(5) | NO   | MUL | NULL    |       |
++-----------+------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)

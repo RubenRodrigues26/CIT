@@ -1,0 +1,103 @@
+mysql> create database if not exists classschedule;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> use classschedule;
+Database changed
+
+mysql> create table if not exists student(student_id int(5) unsigned not null, student_name varchar(25), primary key(student_id))engine=innodb;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> create table if not exists qualified(faculity_id int(5) unsigned not null, course_id varchar(8) not null, date_qualified date, primary key(faculity_id, course_id))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists faculity(faculity_id int(5) unsigned not null, faculty_name varchar(25), primary key(faculity_id))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists section(section_no int(5) unsigned not null auto_increment, semester varchar(8) not null, course_id varchar(8) not null, primary key(section_no, semester, course_id))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists course(course_id char(5) not null, course_name varchar(15), primary key(course_id))engine=innodb;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> create table if not exists registration(student_id int(5) unsigned not null, section_no int(5) unsigned not null, semester varchar(8) not null, primary key(student_id, section_no, semester))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> alter table qualified add constraint fk_qualified foreign key (faculity_id) references faculity(faculity_id) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table qualified add constraint fk_qualified0 foreign key (course_id) references course(course_id) on delete cascade on update cascade;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table section add constraint fk_section foreign key (course_id) references course(course_id) on delete cascade on update cascade;
+Query OK, 0 rows affected (0.09 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table registration add constraint fk_registration foreign key (student_id) references student(student_id) on delete cascade on update cascade;
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table registration add constraint fk_registration0 foreign key (section_no, semester) references section(section_no, semester) on delete no action on update no action;
+
+Query OK, 0 rows affected (0.06 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+
+mysql> desc student;
++--------------+-----------------+------+-----+---------+-------+
+| Field        | Type            | Null | Key | Default | Extra |
++--------------+-----------------+------+-----+---------+-------+
+| student_id   | int(5) unsigned | NO   | PRI | NULL    |       |
+| student_name | varchar(25)     | YES  |     | NULL    |       |
++--------------+-----------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> desc qualified;
++----------------+-----------------+------+-----+---------+-------+
+| Field          | Type            | Null | Key | Default | Extra |
++----------------+-----------------+------+-----+---------+-------+
+| faculity_id    | int(5) unsigned | NO   | PRI | NULL    |       |
+| course_id      | varchar(8)      | NO   | PRI | NULL    |       |
+| date_qualified | date            | YES  |     | NULL    |       |
++----------------+-----------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> desc faculity;
++--------------+-----------------+------+-----+---------+-------+
+| Field        | Type            | Null | Key | Default | Extra |
++--------------+-----------------+------+-----+---------+-------+
+| faculity_id  | int(5) unsigned | NO   | PRI | NULL    |       |
+| faculty_name | varchar(25)     | YES  |     | NULL    |       |
++--------------+-----------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> desc section;
++------------+-----------------+------+-----+---------+----------------+
+| Field      | Type            | Null | Key | Default | Extra          |
++------------+-----------------+------+-----+---------+----------------+
+| section_no | int(5) unsigned | NO   | PRI | NULL    | auto_increment |
+| semester   | varchar(8)      | NO   | PRI | NULL    |                |
+| course_id  | varchar(8)      | NO   | PRI | NULL    |                |
++------------+-----------------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> desc course;
++-------------+-------------+------+-----+---------+-------+
+| Field       | Type        | Null | Key | Default | Extra |
++-------------+-------------+------+-----+---------+-------+
+| course_id   | char(5)     | NO   | PRI | NULL    |       |
+| course_name | varchar(15) | YES  |     | NULL    |       |
++-------------+-------------+------+-----+---------+-------+
+2 rows in set (0.01 sec)
+
+mysql> desc registration;
++------------+-----------------+------+-----+---------+-------+
+| Field      | Type            | Null | Key | Default | Extra |
++------------+-----------------+------+-----+---------+-------+
+| student_id | int(5) unsigned | NO   | PRI | NULL    |       |
+| section_no | int(5) unsigned | NO   | PRI | NULL    |       |
+| semester   | varchar(8)      | NO   | PRI | NULL    |       |
++------------+-----------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+

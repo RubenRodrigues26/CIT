@@ -1,0 +1,12 @@
+--- 2015 DATA ---
+
+
+2015 - Q1 - 12000
+2015 - Q2 - 19800
+2015 - Q3 - 19995
+2015 - Q4 - 11110
+
+--- 2015 RESULTS ---
+2015 Average Sales:15726
+Lowest sales were in Q4 (11110)
+Highest sales were in Q3 (19995)

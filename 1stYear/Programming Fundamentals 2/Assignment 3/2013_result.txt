@@ -1,0 +1,12 @@
+--- 2013 DATA ---
+
+
+2013 - Q1 - 10500
+2013 - Q2 - 10900
+2013 - Q3 - 11340
+2013 - Q4 - 14600
+
+--- 2013 RESULTS ---
+2013 Average Sales:11835
+Lowest sales were in Q1 (10500)
+Highest sales were in Q4 (14600)

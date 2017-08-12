@@ -1,0 +1,12 @@
+--- 2014 DATA ---
+
+
+2014 - Q1 - 9875
+2014 - Q2 - 10470
+2014 - Q3 - 12400
+2014 - Q4 - 13000
+
+--- 2014 RESULTS ---
+2014 Average Sales:11436
+Lowest sales were in Q1 (9875)
+Highest sales were in Q4 (13000)

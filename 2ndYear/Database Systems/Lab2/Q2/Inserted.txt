@@ -1,0 +1,396 @@
+mysql> create database if not exists stayhome;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> use stayhome;
+Database changed
+
+mysql> create table if not exists branch(branchno varchar(5) not null, street varchar(30), city varchar(10), state char(2), zipcode char(5), mgrstaffno varchar(5) not null)engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists staff(staffno varchar(5) not null, name varchar(20), position varchar(10), salary double(8, 2), branchno varchar(6) not null)engine=innodb;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> create table if not exists video(catalogno varchar(5) not null, title varchar(20), category varchar(10), dailyrental double(6,2), price double(6,2), directorno varchar(5) not null)engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists director(directorno varchar(5) not null, directorname varchar(20))engine=innodb;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> create table if not exists actor(actorno varchar(5) not null, actorname varchar(20))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists role(actorno varchar(5) not null, catalogno varchar(5) not null, characters varchar(20))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists members(memberno varchar(5) not null, fname varchar(15), lname varchar(15), address varchar(30))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists registration(branchno varchar(5) not null,memberno varchar(5) not null,staffno varchar(5) not null,datejoined date)engine=innodb;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> create table if not exists rentalagreement(rentalno varchar(5) not null, dateout date, datereturn date, memberno varchar(5) not null, videono varchar(5) not null)engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists videoforrent(videono varchar(5) not null, available bool, catalogno varchar(5) not null, branchno varchar(5) not null)engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> alter table branch add constraint pk_branch primary key(branchno);
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table staff add constraint pk_staff primary key(staffno);
+Query OK, 0 rows affected (0.09 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table video add constraint pk_video primary key(catalogno);
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table director add constraint pk_director primary key(directorno);
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table actor add constraint pk_actor primary key(actorno);
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table role add constraint pk_role primary key(actorno, catalogno);
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table members add constraint pk_member primary key(memberno);
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table registration add constraint pk_registration primary key(branchno, memberno);
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table rentalagreement add constraint pk_rentalagreement primary key(rentalno);
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table videoforrent add constraint pk_video primary key(videono);
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table branch add constraint fk_branch foreign key (mgrstaffno) references staff(staffno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table staff add constraint fk_staff foreign key (branchno) references branch(branchno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.06 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table video add constraint fk_video foreign key (directorno) references director(directorno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table role add constraint fk_role0 foreign key (actorno) references actor(actorno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table role add constraint fk_role1 foreign key (catalogno) references video(catalogno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table registration add constraint fk_registration foreign key (branchno) references branch(branchno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table registration add constraint fk_registration0 foreign key (memberno) references members(memberno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table registration add constraint fk_registration1 foreign key (staffno) references staff(staffno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table rentalagreement add constraint fk_rentalaggrement foreign key (memberno) references members(memberno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.09 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table rentalagreement add constraint fk_rentalaggrement0 foreign key (videono) references videoforrent(videono) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.09 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table videoforrent add constraint fk_videoforrent foreign key (catalogno) references video(catalogno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table videoforrent add constraint fk_videoforrent0 foreign key (branchno) references branch(branchno) on delete restrict on update restrict;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc branch;
++------------+-------------+------+-----+---------+-------+
+| Field      | Type        | Null | Key | Default | Extra |
++------------+-------------+------+-----+---------+-------+
+| branchno   | varchar(5)  | NO   | PRI | NULL    |       |
+| street     | varchar(30) | YES  |     | NULL    |       |
+| city       | varchar(10) | YES  |     | NULL    |       |
+| state      | char(2)     | YES  |     | NULL    |       |
+| zipcode    | char(5)     | YES  |     | NULL    |       |
+| mgrstaffno | varchar(5)  | NO   | MUL | NULL    |       |
++------------+-------------+------+-----+---------+-------+
+6 rows in set (0.00 sec)
+
+mysql> desc staff;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| staffno  | varchar(5)  | NO   | PRI | NULL    |       |
+| name     | varchar(20) | YES  |     | NULL    |       |
+| position | varchar(10) | YES  |     | NULL    |       |
+| salary   | double(8,2) | YES  |     | NULL    |       |
+| branchno | varchar(6)  | NO   | MUL | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+5 rows in set (0.01 sec)
+
+mysql> desc video;
++-------------+-------------+------+-----+---------+-------+
+| Field       | Type        | Null | Key | Default | Extra |
++-------------+-------------+------+-----+---------+-------+
+| catalogno   | varchar(5)  | NO   | PRI | NULL    |       |
+| title       | varchar(20) | YES  |     | NULL    |       |
+| category    | varchar(10) | YES  |     | NULL    |       |
+| dailyrental | double(6,2) | YES  |     | NULL    |       |
+| price       | double(6,2) | YES  |     | NULL    |       |
+| directorno  | varchar(5)  | NO   | MUL | NULL    |       |
++-------------+-------------+------+-----+---------+-------+
+6 rows in set (0.00 sec)
+
+mysql> desc director;
++--------------+-------------+------+-----+---------+-------+
+| Field        | Type        | Null | Key | Default | Extra |
++--------------+-------------+------+-----+---------+-------+
+| directorno   | varchar(5)  | NO   | PRI | NULL    |       |
+| directorname | varchar(20) | YES  |     | NULL    |       |
++--------------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> desc actor;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| actorno   | varchar(5)  | NO   | PRI | NULL    |       |
+| actorname | varchar(20) | YES  |     | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> desc role;
++------------+-------------+------+-----+---------+-------+
+| Field      | Type        | Null | Key | Default | Extra |
++------------+-------------+------+-----+---------+-------+
+| actorno    | varchar(5)  | NO   | PRI | NULL    |       |
+| catalogno  | varchar(5)  | NO   | PRI | NULL    |       |
+| characters | varchar(20) | YES  |     | NULL    |       |
++------------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> desc members;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| memberno | varchar(5)  | NO   | PRI | NULL    |       |
+| fname    | varchar(15) | YES  |     | NULL    |       |
+| lname    | varchar(15) | YES  |     | NULL    |       |
+| address  | varchar(30) | YES  |     | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> desc registration;
++------------+------------+------+-----+---------+-------+
+| Field      | Type       | Null | Key | Default | Extra |
++------------+------------+------+-----+---------+-------+
+| branchno   | varchar(5) | NO   | PRI | NULL    |       |
+| memberno   | varchar(5) | NO   | PRI | NULL    |       |
+| staffno    | varchar(5) | NO   | MUL | NULL    |       |
+| datejoined | date       | YES  |     | NULL    |       |
++------------+------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> desc rentalagreement;
++------------+------------+------+-----+---------+-------+
+| Field      | Type       | Null | Key | Default | Extra |
++------------+------------+------+-----+---------+-------+
+| rentalno   | varchar(5) | NO   | PRI | NULL    |       |
+| dateout    | date       | YES  |     | NULL    |       |
+| datereturn | date       | YES  |     | NULL    |       |
+| memberno   | varchar(5) | NO   | MUL | NULL    |       |
+| videono    | varchar(5) | NO   | MUL | NULL    |       |
++------------+------------+------+-----+---------+-------+
+5 rows in set (0.00 sec)
+
+mysql> desc videoforrent;
++-----------+------------+------+-----+---------+-------+
+| Field     | Type       | Null | Key | Default | Extra |
++-----------+------------+------+-----+---------+-------+
+| videono   | varchar(5) | NO   | PRI | NULL    |       |
+| available | tinyint(1) | YES  |     | NULL    |       |
+| catalogno | varchar(5) | NO   | MUL | NULL    |       |
+| branchno  | varchar(5) | NO   | MUL | NULL    |       |
++-----------+------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> load data local infile '/home/r00144165/DB/branch.txt' into table branch fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 4 rows affected (0.04 sec)
+Records: 4  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/staff.txt' into table staff fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 6 rows affected (0.04 sec)
+Records: 6  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/video.txt' into table video fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 6 rows affected (0.04 sec)
+Records: 6  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/director.txt' into table director fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 6 rows affected (0.03 sec)
+Records: 6  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/actor.txt' into table actor fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 6 rows affected (0.02 sec)
+Records: 6  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/role.txt' into table role fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 8 rows affected, 2 warnings (0.02 sec)
+Records: 8  Deleted: 0  Skipped: 0  Warnings: 2
+
+mysql> load data local infile '/home/r00144165/DB/member.txt' into table members fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 4 rows affected (0.02 sec)
+Records: 4  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/registration.txt' into table registration fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 4 rows affected (0.00 sec)
+Records: 4  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/rentalagreement.txt' into table rentalagreement fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 4 rows affected, 1 warning (0.03 sec)
+Records: 4  Deleted: 0  Skipped: 0  Warnings: 1
+
+mysql> load data local infile '/home/r00144165/DB/videoforrent.txt' into table videoforrent fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 4 rows affected (0.00 sec)
+Records: 4  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> select * from branch;
++----------+-------------------+----------+-------+---------+------------+
+| branchno | street            | city     | state | zipcode | mgrstaffno |
++----------+-------------------+----------+-------+---------+------------+
+| B001     | 8 Jefferson Way   | Portland | OR    | 97201   | S1500      |
+| B002     | City Center Plaza | Seattle  | WA    | 98122   | S0010      |
+| B003     | 14, 8th Avenue    | New York | NY    | 10012   | S0415      |
+| B004     | 16, 14th Avenue   | Seattle  | WA    | 98128   | S2250      |
++----------+-------------------+----------+-------+---------+------------+
+4 rows in set (0.00 sec)
+
+mysql> select * from staff;
++---------+---------------+------------+----------+----------+
+| staffno | name          | position   | salary   | branchno |
++---------+---------------+------------+----------+----------+
+| S0003   | Sally Adams   | Assistant  | 30000.00 | B001     |
+| S0010   | Mary Martinez | Manager    | 50000.00 | B002     |
+| S0415   | Art Peters    | Manager    | 41000.00 | B003     |
+| S1500   | Tom Daniels   | Manager    | 46000.00 | B001     |
+| S2250   | Sally Stern   | Manager    | 48000.00 | B004     |
+| S3250   | Robert Chin   | Supervisor | 32000.00 | B002     |
++---------+---------------+------------+----------+----------+
+6 rows in set (0.00 sec)
+
+mysql> select * from video;
++-----------+-------------------+----------+-------------+-------+------------+
+| catalogno | title             | category | dailyrental | price | directorno |
++-----------+-------------------+----------+-------------+-------+------------+
+| 207132    | Die Another Day   | Action   |        5.00 | 21.99 | D1001      |
+| 330553    | Lord of the Rings | Fantasy  |        5.00 | 31.99 | D4576      |
+| 445624    | Men in Black II   | Action   |        4.00 | 29.99 | D5743      |
+| 634817    | Independence Day  | Sci-Fi   |        4.50 | 32.99 | D3765      |
+| 781132    | Shrek             | Children |        4.00 | 18.50 | D0078      |
+| 902355    | Harry Potter      | Children |        4.50 | 14.50 | D7834      |
++-----------+-------------------+----------+-------------+-------+------------+
+6 rows in set (0.00 sec)
+
+mysql> select * from director;
++------------+------------------+
+| directorno | directorname     |
++------------+------------------+
+| D0078      | Andrew Adamson   |
+| D1001      | Lee Tamahori     |
+| D3765      | Roland Emmerick  |
+| D4576      | Peter Jackson    |
+| D5743      | Barry Sonnenfeld |
+| D7834      | Chris Columbus   |
++------------+------------------+
+6 rows in set (0.00 sec)
+
+mysql> select * from actor;
++---------+------------------+
+| actorno | actorname        |
++---------+------------------+
+| A1002   | Pierce Brosnan   |
+| A2019   | Will Smith       |
+| A3006   | Elijah Wood      |
+| A4343   | Mike Myers       |
+| A7525   | Tommy Lee Jones  |
+| A8401   | Daniel Radcliffe |
++---------+------------------+
+6 rows in set (0.03 sec)
+
+mysql> select * from role;
++---------+-----------+----------------------+
+| actorno | catalogno | characters           |
++---------+-----------+----------------------+
+|         |           | NULL                 |
+| A1002   | 207132    | James Bond           |
+| A2019   | 445624    | Agent J              |
+| A2019   | 634817    | Captain Steve Hiller |
+| A3006   | 330553    | Frodo Baggins        |
+| A3006   | 902355    | Harry Potter         |
+| A4343   | 781132    | Shrek                |
+| A7525   | 445624    | Agent K              |
++---------+-----------+----------------------+
+8 rows in set (0.00 sec)
+
+mysql> select * from members;
++----------+--------+--------+--------------------------------------------+
+| memberno | fname  | lname  | address                                    |
++----------+--------+--------+--------------------------------------------+
+| M115656  | Serena | Parker | 22 W. Capital Way, Portland, OR 97201      |
+| M166884  | Art    | Peters | 89 Redmond Rd, Portland, OR 97117          |
+| M250178  | Bob    | Adams  | 57 – 11th Avenue, Seattle, WA 98105      |
+| M284354  | Don    | Nelson | 123 Suffolk Lane, Seattle, WA 98117        |
++----------+--------+--------+--------------------------------------------+
+4 rows in set (0.00 sec)
+
+mysql> select * from registration;
++----------+----------+---------+------------+
+| branchno | memberno | staffno | datejoined |
++----------+----------+---------+------------+
+| B001     | M115656  | S0003   | 2000-05-12 |
+| B001     | M166884  | S0003   | 2002-09-04 |
+| B002     | M250178  | S3250   | 2001-07-01 |
+| B002     | M284354  | S3250   | 2001-10-09 |
++----------+----------+---------+------------+
+4 rows in set (0.00 sec)
+
+mysql> select * from rentalagreement;
++----------+------------+------------+----------+---------+
+| rentalno | dateout    | datereturn | memberno | videono |
++----------+------------+------------+----------+---------+
+| R668189  | 2003-02-02 | 0000-00-00 | M115656  | 178643  |
+| R668256  | 2003-02-05 | 2003-02-07 | M115656  | 199004  |
+| R753461  | 2003-02-04 | 2003-02-06 | M284354  | 245456  |
+| R753462  | 2003-02-04 | 2003-02-06 | M284354  | 243431  |
++----------+------------+------------+----------+---------+
+4 rows in set (0.00 sec)
+
+mysql> select * from videoforrent;
++---------+-----------+-----------+----------+
+| videono | available | catalogno | branchno |
++---------+-----------+-----------+----------+
+| 178643  |         0 | 634817    | B001     |
+| 199004  |         1 | 207132    | B001     |
+| 243431  |         1 | 634817    | B002     |
+| 245456  |         1 | 207132    | B002     |
++---------+-----------+-----------+----------+
+4 rows in set (0.00 sec)

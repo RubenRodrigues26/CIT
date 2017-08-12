@@ -1,0 +1,5 @@
+branchNo|street|city|state|zipcode|mgrstaffno
+B001|8 Jefferson Way|Portland|OR|97201|S1500
+B002|City Center Plaza|Seattle|WA|98122|S0010
+B003|14, 8th Avenue|New York|NY|10012|S0415
+B004|16, 14th Avenue|Seattle|WA|98128|S2250

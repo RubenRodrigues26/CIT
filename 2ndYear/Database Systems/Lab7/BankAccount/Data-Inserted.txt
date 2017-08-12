@@ -1,0 +1,345 @@
+mysql> create database if not exists BankAccount;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> use BankAccount;
+Database changed
+
+mysql> create table if not exists customer(cust_id int unsigned not null auto_increment, fname varchar(10), lname varchar(10), primary key(cust_id))engine=innodb;
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> create table if not exists account(account_id int unsigned not null auto_increment, product_cd varchar(5) not null, cust_id int unsigned not null, balance double(6,2), primary key(account_id))engine=innodb;
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> create table if not exists product(product_cd varchar(5) not null, name varchar(15))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists transaction(txn_id int unsigned not null auto_increment, txn_type_cd char(5), account_id int unsigned not null, amount double(6,2), txn_date date, primary key(txn_id))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists mail(sentDateTime datetime not null, srcuser char(8) not null, srchost char(20) not null, dstuser char(8) not null, dsthost char(20) not null, size int)engine=innodb;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> alter table product add constraint pk_product primary key(product_cd);
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/customer.txt' into table customer fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 0 rows affected (0.00 sec)
+Records: 0  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/account.txt' into table account fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 5 rows affected (0.03 sec)
+Records: 5  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/product.txt' into table product fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 4 rows affected (0.04 sec)
+Records: 4  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/transaction.txt' into table transaction fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 7 rows affected (0.05 sec)
+Records: 7  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/mail.txt' into table mail fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 16 rows affected (0.05 sec)
+Records: 16  Deleted: 0  Skipped: 0  Warnings: 0
+
+
+
+
+mysql> alter table mail add constraint pk_mail primary key(sentDateTime, srcuser, dstuser);
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table account add constraint fk_account foreign key (product_cd) references product(product_cd) on update cascade on delete cascade;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table account add constraint fk_account0 foreign key (cust_id) references customer(cust_id) on update restrict on delete restrict;
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table transaction add constraint fk_transaction foreign key (account_id) references account(account_id) on update restrict on delete restrict;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc customer;
++---------+------------------+------+-----+---------+----------------+
+| Field   | Type             | Null | Key | Default | Extra          |
++---------+------------------+------+-----+---------+----------------+
+| cust_id | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+| fname   | varchar(10)      | YES  |     | NULL    |                |
+| lname   | varchar(10)      | YES  |     | NULL    |                |
++---------+------------------+------+-----+---------+----------------+
+3 rows in set (0.03 sec)
+
+mysql> desc account;
++------------+------------------+------+-----+---------+----------------+
+| Field      | Type             | Null | Key | Default | Extra          |
++------------+------------------+------+-----+---------+----------------+
+| account_id | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+| product_cd | varchar(5)       | NO   | MUL | NULL    |                |
+| cust_id    | int(10) unsigned | NO   | MUL | NULL    |                |
+| balance    | double(6,2)      | YES  |     | NULL    |                |
++------------+------------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> desc product;
++------------+-------------+------+-----+---------+-------+
+| Field      | Type        | Null | Key | Default | Extra |
++------------+-------------+------+-----+---------+-------+
+| product_cd | varchar(5)  | NO   | PRI | NULL    |       |
+| name       | varchar(15) | YES  |     | NULL    |       |
++------------+-------------+------+-----+---------+-------+
+2 rows in set (0.01 sec)
+
+mysql> desc transaction;
++-------------+------------------+------+-----+---------+----------------+
+| Field       | Type             | Null | Key | Default | Extra          |
++-------------+------------------+------+-----+---------+----------------+
+| txn_id      | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+| txn_type_cd | char(5)          | YES  |     | NULL    |                |
+| account_id  | int(10) unsigned | NO   | MUL | NULL    |                |
+| amount      | double(6,2)      | YES  |     | NULL    |                |
+| txn_date    | date             | YES  |     | NULL    |                |
++-------------+------------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
+
+mysql> desc mail;
++--------------+----------+------+-----+---------+-------+
+| Field        | Type     | Null | Key | Default | Extra |
++--------------+----------+------+-----+---------+-------+
+| sentDateTime | datetime | NO   | PRI | NULL    |       |
+| srcuser      | char(8)  | NO   | PRI | NULL    |       |
+| srchost      | char(20) | NO   |     | NULL    |       |
+| dstuser      | char(8)  | NO   | PRI | NULL    |       |
+| dsthost      | char(20) | NO   |     | NULL    |       |
+| size         | int(11)  | YES  |     | NULL    |       |
++--------------+----------+------+-----+---------+-------+
+6 rows in set (0.00 sec)
+
+mysql> alter table account auto_increment=103;
+Query OK, 0 rows affected (0.00 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+ 
+mysql> alter table transaction auto_increment=978;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/customer.txt' into table customer fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 2 rows affected (0.03 sec)
+Records: 2  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/account.txt' into table account fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/product.txt' into table product fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 4 rows affected (0.02 sec)
+Records: 4  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/transaction.txt' into table transaction fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 7 rows affected (0.00 sec)
+Records: 7  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/mail.txt' into table mail fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 16 rows affected (0.00 sec)
+Records: 16  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> select * from customer;
++---------+--------+-------+
+| cust_id | fname  | lname |
++---------+--------+-------+
+|       1 | George | Blake |
+|       2 | Sue    | Smith |
++---------+--------+-------+
+2 rows in set (0.00 sec)
+
+mysql> select * from account;
++------------+------------+---------+---------+
+| account_id | product_cd | cust_id | balance |
++------------+------------+---------+---------+
+|        103 | CHK        |       1 |   75.00 |
+|        104 | SAV        |       1 |  250.00 |
+|        105 | CHK        |       2 |  783.64 |
+|        106 | MM         |       2 |  500.00 |
+|        107 | LOC        |       2 |    0.00 |
++------------+------------+---------+---------+
+5 rows in set (0.00 sec)
+
+mysql> select * from product;
++------------+----------------+
+| product_cd | name           |
++------------+----------------+
+| CHK        | Checking       |
+| LOC        | Line of Credit |
+| MM         | Money market   |
+| SAV        | Savings        |
++------------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> select * from transaction;
++--------+-------------+------------+---------+------------+
+| txn_id | txn_type_cd | account_id | amount  | txn_date   |
++--------+-------------+------------+---------+------------+
+|    978 | DBT         |        103 |  100.00 | 2004-01-22 |
+|    979 | CDT         |        103 |   25.00 | 2004-02-05 |
+|    980 | DBT         |        104 |  250.00 | 2004-03-09 |
+|    981 | DBT         |        105 | 1000.00 | 2004-03-25 |
+|    982 | CDT         |        105 |  138.50 | 2004-04-02 |
+|    983 | CDT         |        105 |   77.86 | 2004-04-04 |
+|    984 | DBT         |        106 |  500.00 | 2004-03-27 |
++--------+-------------+------------+---------+------------+
+7 rows in set (0.00 sec)
+
+mysql> select * from mail;
++---------------------+---------+---------+---------+---------+---------+
+| sentDateTime        | srcuser | srchost | dstuser | dsthost | size    |
++---------------------+---------+---------+---------+---------+---------+
+| 2006-05-11 10:15:08 | barb    | saturn  | tricia  | mars    |   58274 |
+| 2006-05-12 12:48:13 | tricia  | mars    | gene    | venus   |  194925 |
+| 2006-05-12 15:02:49 | phil    | mars    | phil    | saturn  |    1048 |
+| 2006-05-13 13:59:18 | barb    | saturn  | tricia  | venus   |     271 |
+| 2006-05-14 09:31:37 | gene    | venus   | barb    | mars    |    2291 |
+| 2006-05-14 11:52:17 | phil    | mars    | tricia  | saturn  |    5781 |
+| 2006-05-14 14:42:21 | barb    | venus   | barb    | venus   |   98151 |
+| 2006-05-14 17:03:01 | tricia  | saturn  | phil    | venus   | 2394482 |
+| 2006-05-15 07:17:48 | gene    | mars    | gene    | saturn  |    3824 |
+| 2006-05-15 08:50:57 | phil    | venus   | phil    | venus   |     978 |
+| 2006-05-15 10:25:52 | gene    | mars    | tricia  | saturn  |  998532 |
+| 2006-05-15 17:35:31 | gene    | saturn  | gene    | mars    |    3856 |
+| 2006-05-16 09:00:28 | gene    | venus   | barb    | mars    |     613 |
+| 2006-05-16 23:04:19 | phil    | venus   | barb    | venus   |   10294 |
+| 2006-05-17 12:49:23 | phil    | mars    | tricia  | saturn  |     873 |
+| 2006-05-19 22:21:51 | gene    | saturn  | gene    | venus   |   23992 |
++---------------------+---------+---------+---------+---------+---------+
+16 rows in set (0.00 sec)
+
+mysql> select * from customer where lname like '%Smith%';
++---------+-------+-------+
+| cust_id | fname | lname |
++---------+-------+-------+
+|       2 | Sue   | Smith |
++---------+-------+-------+
+1 row in set (0.00 sec)
+
+mysql> select product_cd, cust_id from account where balance between 200 and 500;
++------------+---------+
+| product_cd | cust_id |
++------------+---------+
+| SAV        |       1 |
+| MM         |       2 |
++------------+---------+
+2 rows in set (0.01 sec)
+
+mysql> select * from transaction where txn_date between '2004-03-01' and '2004-03-31';
++--------+-------------+------------+---------+------------+
+| txn_id | txn_type_cd | account_id | amount  | txn_date   |
++--------+-------------+------------+---------+------------+
+|    980 | DBT         |        104 |  250.00 | 2004-03-09 |
+|    981 | DBT         |        105 | 1000.00 | 2004-03-25 |
+|    984 | DBT         |        106 |  500.00 | 2004-03-27 |
++--------+-------------+------------+---------+------------+
+3 rows in set (0.00 sec)
+
+mysql> select sentDateTime, srcuser, srchost, dstuser, dsthost from mail where dsthost like 's%';
++---------------------+---------+---------+---------+---------+
+| sentDateTime        | srcuser | srchost | dstuser | dsthost |
++---------------------+---------+---------+---------+---------+
+| 2006-05-12 15:02:49 | phil    | mars    | phil    | saturn  |
+| 2006-05-14 11:52:17 | phil    | mars    | tricia  | saturn  |
+| 2006-05-15 07:17:48 | gene    | mars    | gene    | saturn  |
+| 2006-05-15 10:25:52 | gene    | mars    | tricia  | saturn  |
+| 2006-05-17 12:49:23 | phil    | mars    | tricia  | saturn  |
++---------------------+---------+---------+---------+---------+
+5 rows in set (0.00 sec)
+
+mysql> select * from mail where srcuser = 'barb' and dstuser = 'tricia';
++---------------------+---------+---------+---------+---------+-------+
+| sentDateTime        | srcuser | srchost | dstuser | dsthost | size  |
++---------------------+---------+---------+---------+---------+-------+
+| 2006-05-11 10:15:08 | barb    | saturn  | tricia  | mars    | 58274 |
+| 2006-05-13 13:59:18 | barb    | saturn  | tricia  | venus   |   271 |
++---------------------+---------+---------+---------+---------+-------+
+2 rows in set (0.04 sec)
+
+mysql> select * from mail where size > 500000;
++---------------------+---------+---------+---------+---------+---------+
+| sentDateTime        | srcuser | srchost | dstuser | dsthost | size    |
++---------------------+---------+---------+---------+---------+---------+
+| 2006-05-14 17:03:01 | tricia  | saturn  | phil    | venus   | 2394482 |
+| 2006-05-15 10:25:52 | gene    | mars    | tricia  | saturn  |  998532 |
++---------------------+---------+---------+---------+---------+---------+
+2 rows in set (0.01 sec)
+
+mysql> select * from mail where srcuser like 'b%' and size > 5000;
++---------------------+---------+---------+---------+---------+-------+
+| sentDateTime        | srcuser | srchost | dstuser | dsthost | size  |
++---------------------+---------+---------+---------+---------+-------+
+| 2006-05-11 10:15:08 | barb    | saturn  | tricia  | mars    | 58274 |
+| 2006-05-14 14:42:21 | barb    | venus   | barb    | venus   | 98151 |
++---------------------+---------+---------+---------+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> select distinct srcuser, srchost, dstuser, dsthost from mail group by srcuser, srchost, dstuser, dsthost;
++---------+---------+---------+---------+
+| srcuser | srchost | dstuser | dsthost |
++---------+---------+---------+---------+
+| barb    | saturn  | tricia  | mars    |
+| barb    | saturn  | tricia  | venus   |
+| barb    | venus   | barb    | venus   |
+| gene    | mars    | gene    | saturn  |
+| gene    | mars    | tricia  | saturn  |
+| gene    | saturn  | gene    | mars    |
+| gene    | saturn  | gene    | venus   |
+| gene    | venus   | barb    | mars    |
+| phil    | mars    | phil    | saturn  |
+| phil    | mars    | tricia  | saturn  |
+| phil    | venus   | barb    | venus   |
+| phil    | venus   | phil    | venus   |
+| tricia  | mars    | gene    | venus   |
+| tricia  | saturn  | phil    | venus   |
++---------+---------+---------+---------+
+14 rows in set (0.06 sec)
+
+mysql> select product_cd, avg(balance) as avgBalance from account group by product_cd;
++------------+------------+
+| product_cd | avgBalance |
++------------+------------+
+| CHK        | 429.320000 |
+| LOC        |   0.000000 |
+| MM         | 500.000000 |
+| SAV        | 250.000000 |
++------------+------------+
+4 rows in set (0.01 sec)
+
+mysql> select count(txn_id) as myCount from transaction where txn_date between '2004-01-01' and '2004-03-31';
++---------+
+| myCount |
++---------+
+|       5 |
++---------+
+1 row in set (0.04 sec)
+
+mysql> select * from mail where size > 100000 order by size desc;
++---------------------+---------+---------+---------+---------+---------+
+| sentDateTime        | srcuser | srchost | dstuser | dsthost | size    |
++---------------------+---------+---------+---------+---------+---------+
+| 2006-05-14 17:03:01 | tricia  | saturn  | phil    | venus   | 2394482 |
+| 2006-05-15 10:25:52 | gene    | mars    | tricia  | saturn  |  998532 |
+| 2006-05-12 12:48:13 | tricia  | mars    | gene    | venus   |  194925 |
++---------------------+---------+---------+---------+---------+---------+
+3 rows in set (0.04 sec)
+
+mysql> select * from mail where srcuser like '%tricia%' or dstuser like '%tricia%' order by srchost,srcuser desc;
++---------------------+---------+---------+---------+---------+---------+
+| sentDateTime        | srcuser | srchost | dstuser | dsthost | size    |
++---------------------+---------+---------+---------+---------+---------+
+| 2006-05-12 12:48:13 | tricia  | mars    | gene    | venus   |  194925 |
+| 2006-05-14 11:52:17 | phil    | mars    | tricia  | saturn  |    5781 |
+| 2006-05-17 12:49:23 | phil    | mars    | tricia  | saturn  |     873 |
+| 2006-05-15 10:25:52 | gene    | mars    | tricia  | saturn  |  998532 |
+| 2006-05-14 17:03:01 | tricia  | saturn  | phil    | venus   | 2394482 |
+| 2006-05-11 10:15:08 | barb    | saturn  | tricia  | mars    |   58274 |
+| 2006-05-13 13:59:18 | barb    | saturn  | tricia  | venus   |     271 |
++---------------------+---------+---------+---------+---------+---------+
+7 rows in set (0.00 sec)

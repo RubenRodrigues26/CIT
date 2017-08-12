@@ -1,0 +1,7 @@
+actorno|actorname
+A1002|Pierce Brosnan
+A3006|Elijah Wood
+A2019|Will Smith
+A7525|Tommy Lee Jones
+A4343|Mike Myers
+A8401|Daniel Radcliffe

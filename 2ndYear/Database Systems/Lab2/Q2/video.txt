@@ -1,0 +1,7 @@
+catalogno|title|category|dailyrental|price|directorno
+207132|Die Another Day|Action|5.00|21.99|D1001
+902355|Harry Potter|Children|4.50|14.50|D7834
+330553|Lord of the Rings|Fantasy|5.00|31.99|D4576
+781132|Shrek|Children|4.00|18.50|D0078
+445624|Men in Black II|Action|4.00|29.99|D5743
+634817|Independence Day|Sci-Fi|4.50|32.99|D3765

@@ -1,0 +1,5 @@
+memberno|fname|lname|address
+M250178|Bob|Adams|57 – 11th Avenue, Seattle, WA 98105
+M166884|Art|Peters|89 Redmond Rd, Portland, OR 97117
+M115656|Serena|Parker|22 W. Capital Way, Portland, OR 97201
+M284354|Don|Nelson|123 Suffolk Lane, Seattle, WA 98117 

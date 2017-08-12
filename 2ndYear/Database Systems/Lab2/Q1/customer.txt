@@ -1,0 +1,1 @@
+cust_id|fname|lname1|George|Blake2|Sue|Smith

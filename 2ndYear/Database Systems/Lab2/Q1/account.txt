@@ -1,0 +1,6 @@
+accountId|produceCd|custId|balance
+103|CHK|1|75.0
+104|SAV|1|250.0
+105|CHK|2|783.64
+106|MM|2|500.0
+107|LOC|2|0

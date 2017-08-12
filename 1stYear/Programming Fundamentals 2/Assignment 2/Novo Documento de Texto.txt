@@ -1,0 +1,47 @@
+http://stackoverflow.com/questions/23339015/sorting-two-arrays-simultaneously
+
+
+
+: public static void main(String args[]){
+        
+        String a[] = new String[] {
+                "Heineken",
+                "Bud Light",
+                "Coors Lite",
+                "Leffe Blonde",
+                "Budweiser",
+                "Erdinger Non-Alcoholic",
+		 "Bud Premier Select",
+                "Corona",
+                "Barefoot Bohemian",
+                "Monts"
+        };
+        
+        double b[] = new double[] {
+                4,
+                4.2,
+                4.3,
+		6.6,
+                5,
+                0,
+                7.4,
+                4.6,
+                4,
+                8.5
+        };
+	
+	   Scanner keyboard = new Scanner(System.in);
+        String search = keyboard.next();
+        System.out.println(" &quot;
+        
+        searchFreeText(search.toLowerCase(), a, b);
+    }
+	public static void searchFreeText(String search, String[] beersName, double[] beersStrength){
+        for(int i = 0; i < beersName.length; i++){
+            String beerName = beersName.toLowerCase();
+            if(beerName.contains(search))
+                System.out.println(beerName + " - "
+    
+
+ 	
+    

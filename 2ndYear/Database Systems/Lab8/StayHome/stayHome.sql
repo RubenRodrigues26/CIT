@@ -1,0 +1,84 @@
+create database if not exists stayhome;
+use stayhome;
+create table if not exists branch(branchno varchar(5) not null, street varchar(30), city varchar(10), state char(2), zipcode char(5), mgrstaffno varchar(5) not null)engine=innodb;
+create table if not exists staff(staffno varchar(5) not null, name varchar(20), position varchar(10), salary double(8, 2), branchno varchar(6) not null)engine=innodb;
+create table if not exists video(catalogno varchar(6) not null, title varchar(20), category varchar(10), dailyrental double(6,2), price double(6,2), directorno varchar(5) not null)engine=innodb;
+create table if not exists director(directorno varchar(5) not null, directorname varchar(20))engine=innodb;
+create table if not exists actor(actorno varchar(5) not null, actorname varchar(20))engine=innodb;
+create table if not exists role(actorno varchar(5) not null, catalogno varchar(6) not null, characters varchar(20))engine=innodb;
+create table if not exists members(memberno varchar(10) not null, fname varchar(15), lname varchar(15), address varchar(40))engine=innodb;
+create table if not exists registration(branchno varchar(5) not null,memberno varchar(10) not null,staffno varchar(5) not null,datejoined date)engine=innodb;
+create table if not exists rentalagreement(rentalno varchar(10) not null, dateout date, datereturn date, memberno varchar(10) not null, videono varchar(10) not null)engine=innodb;
+create table if not exists videoforrent(videono varchar(10) not null, available bool, catalogno varchar(10) not null, branchno varchar(5) not null)engine=innodb;
+alter table branch add constraint pk_branch primary key(branchno);
+alter table staff add constraint pk_staff primary key(staffno);
+alter table video add constraint pk_video primary key(catalogno);
+alter table director add constraint pk_director primary key(directorno);
+alter table actor add constraint pk_actor primary key(actorno);
+alter table role add constraint pk_role primary key(actorno, catalogno);
+alter table members add constraint pk_member primary key(memberno);
+alter table registration add constraint pk_registration primary key(branchno, memberno);
+alter table rentalagreement add constraint pk_rentalagreement primary key(rentalno);
+alter table videoforrent add constraint pk_video primary key(videono);
+alter table branch add constraint fk_branch foreign key (mgrstaffno) references staff(staffno) on delete restrict on update restrict;
+alter table staff add constraint fk_staff foreign key (branchno) references branch(branchno) on delete restrict on update restrict;
+alter table video add constraint fk_video foreign key (directorno) references director(directorno) on delete restrict on update restrict;
+alter table role add constraint fk_role0 foreign key (actorno) references actor(actorno) on delete restrict on update restrict;
+alter table role add constraint fk_role1 foreign key (catalogno) references video(catalogno) on delete restrict on update restrict;
+alter table registration add constraint fk_registration foreign key (branchno) references branch(branchno) on delete restrict on update restrict;
+alter table registration add constraint fk_registration0 foreign key (memberno) references members(memberno) on delete restrict on update restrict;
+alter table registration add constraint fk_registration1 foreign key (staffno) references staff(staffno) on delete restrict on update restrict;
+alter table rentalagreement add constraint fk_rentalaggrement foreign key (memberno) references members(memberno) on delete restrict on update restrict;
+alter table rentalagreement add constraint fk_rentalaggrement0 foreign key (videono) references videoforrent(videono) on delete restrict on update restrict;
+alter table videoforrent add constraint fk_videoforrent foreign key (catalogno) references video(catalogno) on delete restrict on update restrict;
+alter table videoforrent add constraint fk_videoforrent0 foreign key (branchno) references branch(branchno) on delete restrict on update restrict;
+desc branch;
+desc staff;
+desc video;
+desc director;
+desc actor;
+desc role;
+desc members;
+desc registration;
+desc rentalagreement;
+desc videoforrent;
+
+set foreign_key_checks = 0;
+load data local infile '/home/r00144165/DB/branch.txt' into table branch fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+load data local infile '/home/r00144165/DB/staff.txt' into table staff fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+load data local infile '/home/r00144165/DB/video.txt' into table video fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+load data local infile '/home/r00144165/DB/director.txt' into table director fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+load data local infile '/home/r00144165/DB/actor.txt' into table actor fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+load data local infile '/home/r00144165/DB/role.txt' into table role fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+load data local infile '/home/r00144165/DB/member.txt' into table members fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+load data local infile '/home/r00144165/DB/registration.txt' into table registration fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+load data local infile '/home/r00144165/DB/rentalagreement.txt' into table rentalagreement fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+load data local infile '/home/r00144165/DB/videoforrent.txt' into table videoforrent fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+select * from branch;
+select * from staff;
+select * from video;
+select * from director;
+select * from actor;
+select * from role;
+select * from members;
+select * from registration;
+select * from rentalagreement;
+select * from videoforrent;
+
+
+select catalogno, title, category, price, directorno, dailyrental*3 as threedaysrental from video;
+select * from staff where salary between 45000 and 50000;
+select * from video where category='action' or category='children';
+select * from staff where name like 'Sally%';
+
+select * from video order by price desc;
+select count(staffno) as staffCount, sum(salary) as salarySum from staff where salary > 4000;
+
+select * from staff where salary > (select avg(salary) from staff);
+select staffno,name from staff where salary > any(select salary from staff where branchno like '%B001%');
+select staffno,name from staff where salary > all(select salary from staff where branchno like '%B001%');
+
+select video.title, director.directorname from video,director where video.directorno=director.directorno;
+select video.title, director.directorname, actor.actorname, role.rolecharacter from video, director, actor, role where video.directorno=director.directorno and video.catalogno=role.catalogno and actor.actorno=role.actorno;
+select staff.staffno, count(*) numVideos from staff, videoforrent, rentalagreement where staff.branchno=videoforrent.branchno and videoforrent.videono=rentalagreement.videono group by staff.staffno;
+

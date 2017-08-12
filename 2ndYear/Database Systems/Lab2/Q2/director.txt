@@ -1,0 +1,7 @@
+directorno|directorname
+D1001|Lee Tamahori
+D7834|Chris Columbus
+D4576|Peter Jackson
+D0078|Andrew Adamson
+D5743|Barry Sonnenfeld
+D3765|Roland Emmerick

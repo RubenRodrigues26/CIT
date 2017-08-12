@@ -1,0 +1,120 @@
+mysql> create database if not exists BankAccount;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> use BankAccount;
+Database changed
+
+mysql> create table if not exists customer(cust_id int unsigned not null auto_increment, fname varchar(10), lname varchar(10), primary key(cust_id))engine=innodb;
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> create table if not exists account(account_id int unsigned not null auto_increment, product_cd varchar(5) not null, cust_id int unsigned not null, balance double(6,2), primary key(account_id))engine=innodb;
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> create table if not exists product(product_cd varchar(5) not null, name varchar(15))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists transaction(txn_id int unsigned not null auto_increment, txn_type_cd char(5), account_id int unsigned not null, amount double(6,2), txn_date date, primary key(txn_id))engine=innodb;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table if not exists mail(sentDateTime datetime not null, srcuser char(8) not null, srchost char(20) not null, dstuser char(8) not null, dsthost char(20) not null, size int)engine=innodb;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> alter table product add constraint pk_product primary key(product_cd);
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/customer.txt' into table customer fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 0 rows affected (0.00 sec)
+Records: 0  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/account.txt' into table account fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 5 rows affected (0.03 sec)
+Records: 5  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/product.txt' into table product fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 4 rows affected (0.04 sec)
+Records: 4  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/transaction.txt' into table transaction fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 7 rows affected (0.05 sec)
+Records: 7  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> load data local infile '/home/r00144165/DB/mail.txt' into table mail fields terminated by '|' lines terminated by '\n' ignore 1 lines;
+Query OK, 16 rows affected (0.05 sec)
+Records: 16  Deleted: 0  Skipped: 0  Warnings: 0
+
+
+
+
+mysql> alter table mail add constraint pk_mail primary key(sentDateTime, srcuser, dstuser);
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table account add constraint fk_account foreign key (product_cd) references product(product_cd) on update cascade on delete cascade;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table account add constraint fk_account0 foreign key (cust_id) references customer(cust_id) on update restrict on delete restrict;
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table transaction add constraint fk_transaction foreign key (account_id) references account(account_id) on update restrict on delete restrict;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc customer;
++---------+------------------+------+-----+---------+----------------+
+| Field   | Type             | Null | Key | Default | Extra          |
++---------+------------------+------+-----+---------+----------------+
+| cust_id | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+| fname   | varchar(10)      | YES  |     | NULL    |                |
+| lname   | varchar(10)      | YES  |     | NULL    |                |
++---------+------------------+------+-----+---------+----------------+
+3 rows in set (0.03 sec)
+
+mysql> desc account;
++------------+------------------+------+-----+---------+----------------+
+| Field      | Type             | Null | Key | Default | Extra          |
++------------+------------------+------+-----+---------+----------------+
+| account_id | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+| product_cd | varchar(5)       | NO   | MUL | NULL    |                |
+| cust_id    | int(10) unsigned | NO   | MUL | NULL    |                |
+| balance    | double(6,2)      | YES  |     | NULL    |                |
++------------+------------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> desc product;
++------------+-------------+------+-----+---------+-------+
+| Field      | Type        | Null | Key | Default | Extra |
++------------+-------------+------+-----+---------+-------+
+| product_cd | varchar(5)  | NO   | PRI | NULL    |       |
+| name       | varchar(15) | YES  |     | NULL    |       |
++------------+-------------+------+-----+---------+-------+
+2 rows in set (0.01 sec)
+
+mysql> desc transaction;
++-------------+------------------+------+-----+---------+----------------+
+| Field       | Type             | Null | Key | Default | Extra          |
++-------------+------------------+------+-----+---------+----------------+
+| txn_id      | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+| txn_type_cd | char(5)          | YES  |     | NULL    |                |
+| account_id  | int(10) unsigned | NO   | MUL | NULL    |                |
+| amount      | double(6,2)      | YES  |     | NULL    |                |
+| txn_date    | date             | YES  |     | NULL    |                |
++-------------+------------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
+
+mysql> desc mail;
++--------------+----------+------+-----+---------+-------+
+| Field        | Type     | Null | Key | Default | Extra |
++--------------+----------+------+-----+---------+-------+
+| sentDateTime | datetime | NO   | PRI | NULL    |       |
+| srcuser      | char(8)  | NO   | PRI | NULL    |       |
+| srchost      | char(20) | NO   |     | NULL    |       |
+| dstuser      | char(8)  | NO   | PRI | NULL    |       |
+| dsthost      | char(20) | NO   |     | NULL    |       |
+| size         | int(11)  | YES  |     | NULL    |       |
++--------------+----------+------+-----+---------+-------+
+6 rows in set (0.00 sec)
+
+
