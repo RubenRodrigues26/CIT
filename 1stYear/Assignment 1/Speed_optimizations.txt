@@ -1,0 +1,2 @@
+HTML, CSS all comressed with Minifier.
+All images compressed.
